@@ -79,6 +79,19 @@ app.get('/api/match-history', async (req, res) => {
   }
 });
 
+// Endpoint to fetch match details
+app.get('/api/match-details', async (req, res) => {
+  const { matchId } = req.query;
+
+  try {
+    const response = await axios.get(`https://americas.api.riotgames.com/lol/match/v5/matches/${matchId}?api_key=${apiKey}`);
+    res.json(response.data);
+  } catch (error) {
+    console.error('Error fetching match details:', error);
+    res.status(error.response ? error.response.status : 500).send(error.message);
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });

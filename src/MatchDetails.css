@@ -1,0 +1,28 @@
+/* MatchDetails.css */
+.match-details-container {
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.match-details-container h2 {
+  margin-bottom: 20px;
+}
+
+.match-details-container p {
+  margin: 10px 0;
+}
+
+.match-details-container button {
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+.match-details-container button:hover {
+  background-color: #0056b3;
+}

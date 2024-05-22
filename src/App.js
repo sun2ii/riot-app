@@ -1,16 +1,19 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AppProvider } from './AppContext';
 import SearchComponent from './SearchComponent';
-import MatchDetails from './MatchDetails'; // We'll create this next
+import MatchDetails from './MatchDetails';
 
 const App = () => {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<SearchComponent />} />
-        <Route path="/match/:matchId" element={<MatchDetails />} />
-      </Routes>
-    </Router>
+    <AppProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<SearchComponent />} />
+          <Route path="/match/:matchId" element={<MatchDetails />} />
+        </Routes>
+      </Router>
+    </AppProvider>
   );
 };
 
