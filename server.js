@@ -70,7 +70,7 @@ app.get('/api/match-history', async (req, res) => {
   }
 
   try {
-    const response = await axios.get(`https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?start=0&count=20&api_key=${apiKey}`);
+    const response = await axios.get(`https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?start=${start}&count=${count}&api_key=${apiKey}`);
     const matchIds = response.data;
     res.json(matchIds);
   } catch (error) {
@@ -82,6 +82,3 @@ app.get('/api/match-history', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
-
-// https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/IdRWSNSCRlf7NLADVA4YevpGpu2vmUaXpMHqxz-mwLF7EaRvzONmT0GskOeRv48-vM--2upibo2eNQ/ids?start=0&count=20&api_key=RGAPI-3d63b5b4-93d6-46f7-81ca-f0595aae95c5
-// https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/IdRWSNSCRlf7NLADVA4YevpGpu2vmUaXpMHqxz-mwLF7EaRvzONmT0GskOeRv48-vM--2upibo2eNQ/ids?start=0&count=20&api_key=RGAPI-b6236add-d7a2-4546-be02-11495ffc5dca
