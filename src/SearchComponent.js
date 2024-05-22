@@ -4,6 +4,7 @@ import axios from 'axios';
 const SearchComponent = () => {
   const [fullName, setFullName] = useState('');
   const [data, setData] = useState(null);
+  const [matchHistory, setMatchHistory] = useState([]);
 
   const handleSearch = async () => {
     const [name, tagline] = fullName.split('#');
@@ -17,8 +18,20 @@ const SearchComponent = () => {
         params: { name, tagline }
       });
       setData(response.data);
+      fetchMatchHistory(response.data.puuid);
     } catch (error) {
       console.error('Error fetching data:', error);
+    }
+  };
+
+  const fetchMatchHistory = async (puuid) => {
+    try {
+      const response = await axios.get(`/api/match-history`, {
+        params: { puuid }
+      });
+      setMatchHistory(response.data);
+    } catch (error) {
+      console.error('Error fetching match history:', error);
     }
   };
 
@@ -35,6 +48,12 @@ const SearchComponent = () => {
         <div>
           <h3>Summoner Name: {data.name}</h3>
           <p>Level: {data.summonerLevel}</p>
+          <h4>Recent Matches:</h4>
+          <ul>
+            {matchHistory.map((match, index) => (
+              <li key={index}>{match}</li>
+            ))}
+          </ul>
         </div>
       )}
     </div>
