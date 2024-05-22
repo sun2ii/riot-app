@@ -1,62 +1,79 @@
+// src/SearchComponent.js
 import React, { useState } from 'react';
 import axios from 'axios';
-import './SearchComponent.css'; 
+import { useNavigate } from 'react-router-dom';
+import './SearchComponent.css'; // Ensure this path is correct
 
 const SearchComponent = () => {
   const [fullName, setFullName] = useState('');
+  const [region, setRegion] = useState('americas');
   const [data, setData] = useState(null);
   const [matchHistory, setMatchHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const navigate = useNavigate(); // Correctly use useNavigate
 
   const handleSearch = async () => {
     const [name, tagline] = fullName.split('#');
     if (!name || !tagline) {
-      console.error('Invalid format. Please use name#tagline.');
+      setError('Invalid format. Please use name#tagline.');
       return;
     }
 
+    setError('');
+    setLoading(true);
     try {
-      const response = await axios.get(`/api/search`, {
+      const response = await axios.get('/api/search', {
         params: { name, tagline }
       });
       setData(response.data);
       fetchMatchHistory(response.data.puuid);
     } catch (error) {
       console.error('Error fetching data:', error);
+      setError('Error fetching data. Please try again.');
+      setLoading(false);
     }
   };
 
   const fetchMatchHistory = async (puuid) => {
     try {
-      const response = await axios.get(`/api/match-history`, {
+      const response = await axios.get('/api/match-history', {
         params: { puuid }
       });
       setMatchHistory(response.data);
     } catch (error) {
       console.error('Error fetching match history:', error);
+      setError('Error fetching match history. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
-    const handleMatchClick = (matchId) => {
-    console.log(`Match ID clicked: ${matchId}`);
-    // You can add additional logic here, such as navigating to a detailed match page or displaying a modal
-  };
+  const handleMatchClick = (matchId) => {
+    navigate(`/match/${matchId}`);
+};
 
   return (
-    <div>
-      <input
-        type="text"
-        value={fullName}
-        onChange={(e) => setFullName(e.target.value)}
-        placeholder="Enter name#tagline"
-      />
-      <button onClick={handleSearch}>Search</button>
+    <div className="container">
+      <h1>Search for Summoner</h1>
+      <div className="input-button-container">
+        <input
+          type="text"
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
+          placeholder="Enter name#tagline"
+        />
+        <select value={region} onChange={(e) => setRegion(e.target.value)}>
+          <option value="americas">Americas</option>
+          <option value="euw">EUW</option>
+          <option value="asia">Asia</option>
+        </select>
+        <button onClick={handleSearch}>Search</button>
+      </div>
       {loading && <p>Loading...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
       {data && (
         <div>
-          <h3>Summoner Name: {fullName}</h3>
           <h4>Recent Matches:</h4>
           <ul>
             {matchHistory.map((match, index) => (

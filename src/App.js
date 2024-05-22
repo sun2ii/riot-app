@@ -1,16 +1,17 @@
 import React from 'react';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import SearchComponent from './SearchComponent';
+import MatchDetails from './MatchDetails'; // We'll create this next
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>Riot Games Summoner Search</h1>
-        <SearchComponent />
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<SearchComponent />} />
+        <Route path="/match/:matchId" element={<MatchDetails />} />
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;
