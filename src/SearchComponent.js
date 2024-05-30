@@ -8,6 +8,7 @@ const SearchComponent = () => {
   const { searchData, setSearchData } = useContext(AppContext);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [matchDetails, setMatchDetails] = useState([]);
   const navigate = useNavigate();
 
   const handleSearch = async () => {
@@ -41,14 +42,32 @@ const SearchComponent = () => {
       const response = await axios.get('/api/match-history', {
         params: { puuid, region: searchData.region }
       });
-      console.log('Match history response:', response.data); // Log match history response
+      const last3Matches = response.data.slice(0, 3); // Get the last 3 matches
+      console.log('Match history response:', last3Matches); // Log match history response
       setSearchData(prev => ({
         ...prev,
-        matchHistory: response.data
+        matchHistory: last3Matches
       }));
+      fetchMatchDetails(last3Matches);
     } catch (error) {
       console.error('Error fetching match history:', error);
       setError('Error fetching match history. Please try again.');
+      setLoading(false);
+    }
+  };
+
+  const fetchMatchDetails = async (matches) => {
+    try {
+      const matchDetailsPromises = matches.map(matchId =>
+        axios.get(`/api/match-details`, { params: { matchId } })
+      );
+      const matchDetailsResponses = await Promise.all(matchDetailsPromises);
+      const matchDetails = matchDetailsResponses.map(res => res.data);
+      console.log('Match details:', matchDetails); // Log match details
+      setMatchDetails(matchDetails);
+    } catch (error) {
+      console.error('Error fetching match details:', error);
+      setError('Error fetching match details. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -82,7 +101,31 @@ const SearchComponent = () => {
       </div>
       {loading && <p>Loading...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      {searchData.data && (
+      {matchDetails.length > 0 && (
+        <div>
+          <h4>Details of Last 3 Matches:</h4>
+          {matchDetails.map((match, index) => {
+            const participant = match.info.participants.find(p => p.puuid === searchData.data.puuid);
+            const team = match.info.teams.find(t => t.teamId === participant.teamId);
+            return (
+              <div key={index} className="match-details">
+                <h5>Match {index + 1}:</h5>
+                <p>Win: {team.win ? 'Yes' : 'No'}</p>
+                <p>Kills: {participant.kills}</p>
+                <p>Deaths: {participant.deaths}</p>
+                <p>Assists: {participant.assists}</p>
+                <p>KDA: {participant.challenges.kda}</p>
+                <p>Gold Earned: {participant.goldEarned}</p>
+                <p>Total Damage Dealt to Champions: {participant.totalDamageDealtToChampions}</p>
+                <p>Vision Score: {participant.visionScore}</p>
+                <p>Game Duration: {Math.floor(match.info.gameDuration / 60)} minutes</p>
+                <p>First Blood Kill: {participant.firstBloodKill ? 'Yes' : 'No'}</p>
+              </div>
+            );
+          })}
+        </div>
+      )}
+      {searchData.matchHistory.length > 0 && (
         <div>
           <h4>Recent Matches:</h4>
           <ul>
