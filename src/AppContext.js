@@ -7,7 +7,7 @@ export const AppProvider = ({ children }) => {
     fullName: '',
     region: 'americas',
     data: null,
-    matchHistory: [],
+    matchHistory: []
   });
 
   return (
@@ -18,4 +18,3 @@ export const AppProvider = ({ children }) => {
 };
 
 export default AppContext;
-

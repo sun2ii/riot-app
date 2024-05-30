@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import AppContext from './AppContext';
-import './SearchComponent.css'; // Ensure this path is correct
+import './SearchComponent.css';
 
 const SearchComponent = () => {
   const { searchData, setSearchData } = useContext(AppContext);
@@ -25,7 +25,8 @@ const SearchComponent = () => {
       });
       setSearchData(prev => ({
         ...prev,
-        data: response.data
+        data: response.data,
+        matchHistory: []
       }));
       fetchMatchHistory(response.data.puuid);
     } catch (error) {
@@ -40,6 +41,7 @@ const SearchComponent = () => {
       const response = await axios.get('/api/match-history', {
         params: { puuid, region: searchData.region }
       });
+      console.log('Match history response:', response.data); // Log match history response
       setSearchData(prev => ({
         ...prev,
         matchHistory: response.data
@@ -53,7 +55,9 @@ const SearchComponent = () => {
   };
 
   const handleMatchClick = (matchId) => {
-    navigate(`/match/${matchId}`);
+    const puuid = searchData.data.puuid;
+    console.log('Navigating to match details with puuid:', puuid); // Log puuid
+    navigate(`/match/${matchId}/${puuid}`);
   };
 
   return (
