@@ -1,8 +1,9 @@
 import React, { useContext, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import AppContext from './AppContext';
-import './SearchComponent.css';
+import AppContext from '../AppContext';
+import '../css/SearchComponent.css';
+import MatchChart from './MatchChart'; // Import the new component
 
 const SearchComponent = () => {
   const { searchData, setSearchData } = useContext(AppContext);
@@ -75,8 +76,14 @@ const SearchComponent = () => {
 
   const handleMatchClick = (matchId) => {
     const puuid = searchData.data.puuid;
-    console.log('Navigating to match details with puuid:', puuid); // Log puuid
     navigate(`/match/${matchId}/${puuid}`);
+  };
+
+
+  const handleEnter = (event) => {
+    if (event.key === 'Enter') {
+      handleSearch();
+    }
   };
 
   return (
@@ -87,6 +94,7 @@ const SearchComponent = () => {
           type="text"
           value={searchData.fullName}
           onChange={(e) => setSearchData({ ...searchData, fullName: e.target.value })}
+          onKeyDown={handleEnter}
           placeholder="Enter name#tagline"
         />
         <select
@@ -102,28 +110,10 @@ const SearchComponent = () => {
       {loading && <p>Loading...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
       {matchDetails.length > 0 && (
-        <div>
-          <h4>Details of Last 3 Matches:</h4>
-          {matchDetails.map((match, index) => {
-            const participant = match.info.participants.find(p => p.puuid === searchData.data.puuid);
-            const team = match.info.teams.find(t => t.teamId === participant.teamId);
-            return (
-              <div key={index} className="match-details">
-                <h5>Match {index + 1}:</h5>
-                <p>Win: {team.win ? 'Yes' : 'No'}</p>
-                <p>Kills: {participant.kills}</p>
-                <p>Deaths: {participant.deaths}</p>
-                <p>Assists: {participant.assists}</p>
-                <p>KDA: {participant.challenges.kda}</p>
-                <p>Gold Earned: {participant.goldEarned}</p>
-                <p>Total Damage Dealt to Champions: {participant.totalDamageDealtToChampions}</p>
-                <p>Vision Score: {participant.visionScore}</p>
-                <p>Game Duration: {Math.floor(match.info.gameDuration / 60)} minutes</p>
-                <p>First Blood Kill: {participant.firstBloodKill ? 'Yes' : 'No'}</p>
-              </div>
-            );
-          })}
-        </div>
+        <MatchChart
+          puuid={searchData.data.puuid}
+          matchDetails={matchDetails}
+        /> 
       )}
       {searchData.matchHistory.length > 0 && (
         <div>

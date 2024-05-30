@@ -1,0 +1,63 @@
+.body {
+  background-image: url('/public/league.jpeg'); /* Adjust the path accordingly */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+.chart-container {
+  margin-top: 20px;
+  background-color: rgba(68, 68, 68, 0.9); /* Make background slightly transparent */
+  padding: 20px;
+  border-radius: 10px;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  margin: 10px 0;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #555;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+}
+
+button:hover {
+  background-color: #777;
+}
+
+.match-details {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: rgba(68, 68, 68, 0.9); /* Make background slightly transparent */
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+.match-details p {
+  margin: 0;
+  color: white;
+}
+
+/* New styles for the title */
+.title-match-statistics {
+  text-align: center;
+  color: white;
+  font-family: 'Poppins', sans-serif; /* Example of a cool font */
+  font-size: 2em;
+  margin-bottom: 20px;
+}

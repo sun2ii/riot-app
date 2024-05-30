@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
-import './MatchDetails.css'; // Create this file for styles
+import '../css/MatchDetails.css'; 
 
 const MatchDetails = () => {
   const { matchId, puuid } = useParams();

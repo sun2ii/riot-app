@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import SearchComponent from './SearchComponent';
-import MatchDetails from './MatchDetails';
+import SearchComponent from './components/SearchComponent';
+import MatchDetails from './components/MatchDetails';
 import { AppProvider } from './AppContext';
 
 const App = () => {
