@@ -3,13 +3,14 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import AppContext from '../AppContext';
 import '../css/SearchComponent.css';
-import MatchChart from './MatchChart'; // Import the new component
+import MatchChart from './MatchChart';
 
 const SearchComponent = () => {
   const { searchData, setSearchData } = useContext(AppContext);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [matchDetails, setMatchDetails] = useState([]);
+  const [numMatches, setNumMatches] = useState(3);  // State for number of matches
   const navigate = useNavigate();
 
   const handleSearch = async () => {
@@ -23,7 +24,10 @@ const SearchComponent = () => {
     setLoading(true);
     try {
       const response = await axios.get('/api/search', {
-        params: { name, tagline, region: searchData.region }
+        params: { name, tagline, region: searchData.region },
+        headers: {
+          'Authorization': `Bearer ${process.env.REACT_APP_API_KEY}`
+        }
       });
       setSearchData(prev => ({
         ...prev,
@@ -41,15 +45,19 @@ const SearchComponent = () => {
   const fetchMatchHistory = async (puuid) => {
     try {
       const response = await axios.get('/api/match-history', {
-        params: { puuid, region: searchData.region }
+        params: { puuid, region: searchData.region },
+        headers: {
+          'Authorization': `Bearer ${process.env.REACT_APP_API_KEY}`
+        }
       });
-      const last3Matches = response.data.slice(0, 3); // Get the last 3 matches
-      console.log('Match history response:', last3Matches); // Log match history response
+      const matches = response.data.slice(0, numMatches);  // Adjust based on numMatches
+      console.log('Match history response:', matches);  // Log match history response
       setSearchData(prev => ({
         ...prev,
-        matchHistory: last3Matches
+        matchHistory: matches,
+        puuid: puuid  // Store puuid in searchData
       }));
-      fetchMatchDetails(last3Matches);
+      fetchMatchDetails(matches, puuid);
     } catch (error) {
       console.error('Error fetching match history:', error);
       setError('Error fetching match history. Please try again.');
@@ -57,14 +65,22 @@ const SearchComponent = () => {
     }
   };
 
-  const fetchMatchDetails = async (matches) => {
+  const fetchMatchDetails = async (matches, puuid) => {
     try {
       const matchDetailsPromises = matches.map(matchId =>
-        axios.get(`/api/match-details`, { params: { matchId } })
+        axios.get(`/api/match-details`, {
+          params: { matchId },
+          headers: {
+            'Authorization': `Bearer ${process.env.REACT_APP_API_KEY}`
+          }
+        })
       );
       const matchDetailsResponses = await Promise.all(matchDetailsPromises);
-      const matchDetails = matchDetailsResponses.map(res => res.data);
-      console.log('Match details:', matchDetails); // Log match details
+      const matchDetails = matchDetailsResponses.map(res => ({
+        ...res.data,
+        puuid: puuid  // Add the puuid to each match object
+      }));
+      console.log('Match details:', matchDetails);  // Log match details
       setMatchDetails(matchDetails);
     } catch (error) {
       console.error('Error fetching match details:', error);
@@ -76,14 +92,18 @@ const SearchComponent = () => {
 
   const handleMatchClick = (matchId) => {
     const puuid = searchData.data.puuid;
+    console.log('Navigating to match details with puuid:', puuid);  // Log puuid
     navigate(`/match/${matchId}/${puuid}`);
   };
 
-
-  const handleEnter = (event) => {
+  const handleKeyPress = (event) => {
     if (event.key === 'Enter') {
       handleSearch();
     }
+  };
+
+  const handleNumMatchesChange = (event) => {
+    setNumMatches(parseInt(event.target.value, 10));
   };
 
   return (
@@ -94,7 +114,7 @@ const SearchComponent = () => {
           type="text"
           value={searchData.fullName}
           onChange={(e) => setSearchData({ ...searchData, fullName: e.target.value })}
-          onKeyDown={handleEnter}
+          onKeyPress={handleKeyPress}  // Add keypress event listener
           placeholder="Enter name#tagline"
         />
         <select
@@ -107,13 +127,24 @@ const SearchComponent = () => {
         </select>
         <button onClick={handleSearch}>Search</button>
       </div>
+      <div>
+        <label htmlFor="num-matches">Number of matches to display: </label>
+        <select id="num-matches" value={numMatches} onChange={handleNumMatchesChange}>
+          <option value={3}>3</option>
+          <option value={5}>5</option>
+          <option value={10}>10</option>
+        </select>
+      </div>
       {loading && <p>Loading...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
       {matchDetails.length > 0 && (
+        <div className="chart-container">
+          <h2 className="title-match-statistics">Match Statistics</h2>
         <MatchChart
           puuid={searchData.data.puuid}
           matchDetails={matchDetails}
         /> 
+        </div>
       )}
       {searchData.matchHistory.length > 0 && (
         <div>
