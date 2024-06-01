@@ -3,62 +3,45 @@ body {
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
-  margin: 0 auto;
+  margin: 0;
   padding: 0;
   font-family: Arial, sans-serif;
+  height: 100vh; /* Ensure the body takes full height */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .container {
-  max-width: 1000px; /* Increase the maximum width */
-  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding: 20px;
-  background-color: #333;
-  border-radius: 10px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  background-color: rgba(68, 68, 68, 0.8); /* Add a background to the container for better readability */
+  border-radius: 10px; /* Rounded corners */
 }
 
 .input-button-container {
   display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
   gap: 10px;
   margin-bottom: 20px;
 }
 
-.input-button-container input,
-.input-button-container select,
-.input-button-container button {
-  padding: 10px;
-  font-size: 1.2em;
-  border-radius: 5px;
-  border: none;
-}
-
-.input-button-container input {
-  flex: 1;
-}
-
-.input-button-container button {
-  background-color: #007bff;
-  color: white;
-  cursor: pointer;
-}
-
-.input-button-container button:hover {
-  background-color: #0056b3;
-}
-
 .chart-container {
   margin-top: 20px;
-  background-color: #444;
+  background-color: rgba(68, 68, 68, 0.9);
   padding: 20px;
   border-radius: 10px;
+  width: 100%; /* Full width for better size */
+  max-width: 800px; /* Max width for larger display */
 }
 
-.chart-container h2 {
+.champion-name {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #fff;
   text-align: center;
-  color: white;
+  margin-bottom: 10px;
 }
 
 ul {
@@ -84,30 +67,47 @@ button:hover {
   background-color: #777;
 }
 
-h1, h4 {
-  text-align: center;
-  color: white;
-}
-
-h1 {
-  margin-bottom: 40px;
-}
-
-h4 {
-  margin-top: 40px;
-}
-
 .match-details {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  background-color: #444;
+  background-color: rgba(68, 68, 68, 0.9); /* Make background slightly transparent */
   padding: 20px;
   border-radius: 10px;
   margin-top: 20px;
 }
 
-.match-details p {
+.match-details {
   margin: 0;
   color: white;
+}
+
+.title-match-statistics {
+  text-align: center;
+  color: white;
+  font-family: 'Poppins', sans-serif; /* Example of a cool font */
+  font-size: 2em;
+  margin-bottom: 20px;
+}
+
+.recent-matches {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 columns */
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.recent-match-button {
+  padding: 10px 20px;
+  background-color: #555;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+  text-align: center;
+}
+
+.recent-match-button:hover {
+  background-color: #777;
 }

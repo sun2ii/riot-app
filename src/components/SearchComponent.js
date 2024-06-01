@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import AppContext from '../AppContext';
@@ -10,8 +10,14 @@ const SearchComponent = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [matchDetails, setMatchDetails] = useState([]);
-  const [numMatches, setNumMatches] = useState(3);  // State for number of matches
+  const [numMatches, setNumMatches] = useState(3); // State for number of matches to display in statistics
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (searchData.puuid) {
+      fetchMatchHistory(searchData.puuid, 15); // Fetch 15 matches on initial load
+    }
+  }, [searchData.puuid]);
 
   const handleSearch = async () => {
     const [name, tagline] = searchData.fullName.split('#');
@@ -32,9 +38,9 @@ const SearchComponent = () => {
       setSearchData(prev => ({
         ...prev,
         data: response.data,
-        matchHistory: []
+        matchHistory: [],
+        puuid: response.data.puuid  // Store puuid in searchData
       }));
-      fetchMatchHistory(response.data.puuid);
     } catch (error) {
       console.error('Error fetching data:', error);
       setError('Error fetching data. Please try again.');
@@ -42,7 +48,7 @@ const SearchComponent = () => {
     }
   };
 
-  const fetchMatchHistory = async (puuid) => {
+  const fetchMatchHistory = async (puuid, limit) => {
     try {
       const response = await axios.get('/api/match-history', {
         params: { puuid, region: searchData.region },
@@ -50,12 +56,11 @@ const SearchComponent = () => {
           'Authorization': `Bearer ${process.env.REACT_APP_API_KEY}`
         }
       });
-      const matches = response.data.slice(0, numMatches);  // Adjust based on numMatches
-      console.log('Match history response:', matches);  // Log match history response
+      const matches = response.data.slice(0, limit); // Fetch only the number of matches needed
+      console.log('Match history response:', matches); // Log match history response
       setSearchData(prev => ({
         ...prev,
-        matchHistory: matches,
-        puuid: puuid  // Store puuid in searchData
+        matchHistory: matches
       }));
       fetchMatchDetails(matches, puuid);
     } catch (error) {
@@ -78,9 +83,9 @@ const SearchComponent = () => {
       const matchDetailsResponses = await Promise.all(matchDetailsPromises);
       const matchDetails = matchDetailsResponses.map(res => ({
         ...res.data,
-        puuid: puuid  // Add the puuid to each match object
+        puuid: puuid // Add the puuid to each match object
       }));
-      console.log('Match details:', matchDetails);  // Log match details
+      console.log('Match details:', matchDetails); // Log match details
       setMatchDetails(matchDetails);
     } catch (error) {
       console.error('Error fetching match details:', error);
@@ -92,7 +97,7 @@ const SearchComponent = () => {
 
   const handleMatchClick = (matchId) => {
     const puuid = searchData.data.puuid;
-    console.log('Navigating to match details with puuid:', puuid);  // Log puuid
+    console.log('Navigating to match details with puuid:', puuid); // Log puuid
     navigate(`/match/${matchId}/${puuid}`);
   };
 
@@ -106,6 +111,8 @@ const SearchComponent = () => {
     setNumMatches(parseInt(event.target.value, 10));
   };
 
+  const displayedMatchDetails = matchDetails.slice(0, numMatches);
+
   return (
     <div className="container">
       <h1>Search for Summoner</h1>
@@ -114,7 +121,7 @@ const SearchComponent = () => {
           type="text"
           value={searchData.fullName}
           onChange={(e) => setSearchData({ ...searchData, fullName: e.target.value })}
-          onKeyPress={handleKeyPress}  // Add keypress event listener
+          onKeyPress={handleKeyPress} // Add keypress event listener
           placeholder="Enter name#tagline"
         />
         <select
@@ -137,25 +144,25 @@ const SearchComponent = () => {
       </div>
       {loading && <p>Loading...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      {matchDetails.length > 0 && (
+      {displayedMatchDetails.length > 0 && (
         <div className="chart-container">
           <h2 className="title-match-statistics">Match Statistics</h2>
-        <MatchChart
-          puuid={searchData.data.puuid}
-          matchDetails={matchDetails}
-        /> 
+          <MatchChart
+            puuid={searchData.data.puuid}
+            matchDetails={displayedMatchDetails}
+          />
         </div>
       )}
       {searchData.matchHistory.length > 0 && (
         <div>
           <h4>Recent Matches:</h4>
-          <ul>
+          <div className="recent-matches">
             {searchData.matchHistory.map((match, index) => (
-              <li key={index} onClick={() => handleMatchClick(match)}>
-                <button>{match}</button>
-              </li>
+              <button key={index} onClick={() => handleMatchClick(match)} className="recent-match-button">
+                {match}
+              </button>
             ))}
-          </ul>
+          </div>
         </div>
       )}
     </div>
